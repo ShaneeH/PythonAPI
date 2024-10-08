@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_httpauth import HTTPTokenAuth
@@ -28,6 +28,25 @@ def verify_token(token):
         return tokens[token]
     return None
 
+
+@app.route('/test', methods=['GET'])
+def test():
+    return 'Server is Running !'
+
+@app.route('/Num' , methods=['POST'])
+def Add():
+            # Expecting 'num' to be sent as form data or JSON
+    num = request.form.get('num') or request.json.get('num')
+    try:
+        num = int(num)
+        new_num = num * 10
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid input. Please send a valid number."}), 400
+
+    # Return the result as a JSON response
+    return jsonify({"result": new_num})
+
+
 # Define the 'Hello World' route with rate limiting and authentication
 @app.route('/hello', methods=['GET'])
 @auth.login_required  # Require authentication
@@ -49,6 +68,6 @@ if __name__ == '__main__':
 
 #This is what the Request will look like 
 
-# URL =>  GET /hello?echo=PostmanTest HTTP/1.1
+# URL =>  GET http://127.0.0.1:5000/hello?echo=PostmanTest 
 # Headers => [Authorization: Bearer user1_token]
 
